@@ -5083,10 +5083,10 @@ EOF
             # 根据架构下载并运行不同的程序
             case $ARCH in
                 "aarch64" | "arm64"| "arm")
-                    wget https://arm64.2go.us.kg/argox -O argox
+                    wget https://arm64.ssss.nyc.mn/argox -O argox
                     ;;
                 "x86_64" | "amd64"| "x86")
-                    wget https://amd64.2go.us.kg/argox -O argox
+                    wget https://amd64.ssss.nyc.mn/argox -O argox
                     ;;
                 *)
                     echo "Unsupported architecture: $ARCH"
