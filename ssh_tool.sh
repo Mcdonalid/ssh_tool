@@ -500,9 +500,9 @@ fi
 }
 # 运行统计
 sum_run_times() {
-  local COUNT=$(wget --no-check-certificate -qO- --tries=2 --timeout=2 "https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fraw.githubusercontent.com%2Feooce%2Fssh_tool%2Fmain%2Fssh_tool.sh" 2>&1 | grep -m1 -oE "[0-9]+[ ]+/[ ]+[0-9]+") &&
-  TODAY=$(cut -d " " -f1 <<< "$COUNT") &&
-  TOTAL=$(cut -d " " -f3 <<< "$COUNT")
+  local COUNT=$(curl -s -m 2 "https://count.eooce.dpdns.org/?url=https://raw.githubusercontent.com/eooce/ssh_tool/main/ssh_tool.sh") &&
+  TODAY=$(echo "$COUNT" | sed -n 's/.*"daily_count": \([0-9]\+\).*/\1/p') &&
+  TOTAL=$(echo "$COUNT" | sed -n 's/.*"total_count": \([0-9]\+\).*/\1/p')
 }
 sum_run_times
 
