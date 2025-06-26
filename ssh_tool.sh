@@ -5923,9 +5923,9 @@ EOF
                 # 验证安装
                 if command -v go &> /dev/null; then
                     echo -e "${green}GO安装完成，当前Go版本：${red}$(go version | grep -oE 'go[0-9]+\.[0-9]+\.[0-9]+' | cut -c 3-)${re}"
+                    echo -e "${red}退出脚本后请手动执行以下命令使全局环境变量生效：${yellow}source /etc/profile${re}\n"
                 else
-                    echo -e "${red}Go安装成功，但全局环境变量未生效，请手动执行以下命令使环境变量生效：${re}"
-                    echo "source /etc/profile"
+                    echo -e "${red}Go安装完成，但全局环境变量未生效，请退出脚本后手动执行以下命令使全局环境变量生效：${yellow}source /etc/profile${re}\n"
                 fi
               sleep 1
               break_end
