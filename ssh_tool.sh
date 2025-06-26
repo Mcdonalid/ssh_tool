@@ -5907,13 +5907,14 @@ EOF
               tar -C /usr/local -xzf go_latest.tar.gz
 
               # 设置环境变量
-              export GOPATH=$HOME/go
-              export PATH=$PATH:$GOPATH/bin
-              export PATH=$PATH:/usr/local/go/bin
-              source ~/.bashrc
-              source ~/.profile
-              source ~/.bash_profile
+             if grep -qi alpine /etc/os-release; then
+                 echo 'export PATH=/usr/local/go/bin:$PATH' > /etc/profile.d/go.sh
+                 chmod +x /etc/profile.d/go.sh
+              else
+                 echo 'export PATH=/usr/local/go/bin:$PATH' | tee -a /etc/profile > /dev/null
+              fi
               rm go_latest.tar.gz
+              go verison
               echo -e "${green}GO安装完成，当前Go版本：${red}$(go version | grep -oE 'go[0-9]+\.[0-9]+\.[0-9]+' | cut -c 3-)${re}"
               sleep 1
               break_end
