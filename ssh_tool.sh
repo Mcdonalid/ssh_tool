@@ -5907,7 +5907,8 @@ EOF
               tar -C /usr/local -xzf go_latest.tar.gz
 
               # 设置环境变量
-             if grep -qi alpine /etc/os-release; then
+              export PATH=/usr/local/go/bin:$PATH
+              if grep -qi alpine /etc/os-release; then
                  echo 'export PATH=/usr/local/go/bin:$PATH' > /etc/profile.d/go.sh
                  chmod +x /etc/profile.d/go.sh
               else
