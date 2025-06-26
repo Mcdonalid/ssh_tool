@@ -5852,7 +5852,7 @@ EOF
                 # 获取最新版Go的版本
                 html=$(curl -s https://go.dev/dl/)
                 latest_version=$(echo "$html" | grep -oP 'go[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1)    
-
+                
                 # 根据系统架构选择不同的下载链接
                 architecture=$(uname -m)
                 case "$architecture" in
@@ -5871,19 +5871,18 @@ EOF
                         main_menu
                         ;;
                 esac
-
+                
                 # 检查是否已安装Go
                 if command -v go &> /dev/null; then
                     # 获取当前已安装的Go版本
                     installed_version=$(go version | grep -oE 'go[0-9]+\.[0-9]+\.[0-9]+')
                     echo -e "${yellow}当前已安装的Go版本：${red}$installed_version${re}"
-
+                
                     # 比较已安装版本与最新版本
                     if [ "$installed_version" = "$latest_version" ]; then
                         echo -e "${green}当前Go已经是最新版本，无需更新。${re}"
                         sleep 2
                         main_menu
-
                     elif [ "$(printf "$installed_version\n$latest_version" | sort -V | head -n 1)" != "$installed_version" ]; then
                         echo -e "${yellow}发现新版本：$latest_version。${re}"
                         read -p $'\033[1;91m需要卸载当前版本 $installed_version 并安装新版本 $latest_version 吗 [y/n]: \033[0m' confirm
@@ -5891,7 +5890,6 @@ EOF
                         if [ "$confirm" == "y" ] || [ "$confirm" == "Y" ]; then
                             echo "卸载旧版Go：$installed_version"
                             rm -rf /usr/local/go
-
                         else
                             echo -e "${yellow}退出更新。${re}"
                             sleep 2
@@ -5901,22 +5899,34 @@ EOF
                 else
                     echo -e "${yellow}系统中未安装Go，正在为你安装最新版Go...${re}"
                 fi
-              # 下载并安装最新版Go
-              install tar
-              wget -O go_latest.tar.gz "$latest_version_url"
-              tar -C /usr/local -xzf go_latest.tar.gz
-
-              # 设置环境变量
-              export PATH=/usr/local/go/bin:$PATH
-              if grep -qi alpine /etc/os-release; then
-                 echo 'export PATH=/usr/local/go/bin:$PATH' > /etc/profile.d/go.sh
-                 chmod +x /etc/profile.d/go.sh
-              else
-                 echo 'export PATH=/usr/local/go/bin:$PATH' | tee -a /etc/profile > /dev/null
-              fi
-              rm go_latest.tar.gz
-              go verison
-              echo -e "${green}GO安装完成，当前Go版本：${red}$(go version | grep -oE 'go[0-9]+\.[0-9]+\.[0-9]+' | cut -c 3-)${re}"
+                
+                # 下载并安装最新版Go
+                install tar
+                wget -O go_latest.tar.gz "$latest_version_url"
+                tar -C /usr/local -xzf go_latest.tar.gz
+                
+                # 设置环境变量
+                GO_PATH="/usr/local/go/bin"
+                if [[ ":$PATH:" != *":${GO_PATH}:"* ]]; then
+                    if grep -qi alpine /etc/os-release; then
+                        echo "export PATH=${GO_PATH}:\$PATH" > /etc/profile.d/go.sh
+                        chmod +x /etc/profile.d/go.sh
+                        source /etc/profile.d/go.sh
+                    else
+                        echo "export PATH=${GO_PATH}:\$PATH" | tee -a /etc/profile > /dev/null
+                        source /etc/profile
+                    fi
+                fi
+                
+                rm go_latest.tar.gz
+                
+                # 验证安装
+                if command -v go &> /dev/null; then
+                    echo -e "${green}GO安装完成，当前Go版本：${red}$(go version | grep -oE 'go[0-9]+\.[0-9]+\.[0-9]+' | cut -c 3-)${re}"
+                else
+                    echo -e "${red}Go安装成功，但全局环境变量未生效，请手动执行以下命令使环境变量生效：${re}"
+                    echo "source /etc/profile"
+                fi
               sleep 1
               break_end
             ;;            
