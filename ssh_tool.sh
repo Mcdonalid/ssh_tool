@@ -193,7 +193,7 @@ break_end() {
 # 返回主菜单
 main_menu() {
     cd ~
-    ./ssh_tool.sh
+    k
     exit
 }
 
