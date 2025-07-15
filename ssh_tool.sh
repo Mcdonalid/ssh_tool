@@ -13,27 +13,40 @@ skyblue='\e[1;96m'
 [[ $EUID -ne 0 ]] && echo -e "${red}注意: 请在root用户下运行脚本${re}" && sleep 1 && exit 1
 
 # 创建快捷指令
-add_alias() {
-    config_file=$1
-    alias_names=("k" "K")
-    [ ! -f "$config_file" ] || touch "$config_file"
-    for alias_name in "${alias_names[@]}"; do
-        if ! grep -q "alias $alias_name=" "$config_file"; then 
-            echo "Adding alias $alias_name to $config_file"
-            echo "alias $alias_name='cd ~ && ./ssh_tool.sh'" >> "$config_file"
+create_shortcut() {
+    wrapper_content='#!/bin/bash
+# 在线获取最新脚本并执行
+SCRIPT_URL="https://main.ssss.nyc.mn/ssh_tool.sh"
+TEMP_SCRIPT="/tmp/ssh_tool_latest.sh"
+
+# 下载最新脚本（屏蔽输出）
+if curl -fsSL "$SCRIPT_URL" -o "$TEMP_SCRIPT" >/dev/null 2>&1; then
+    chmod +x "$TEMP_SCRIPT" >/dev/null 2>&1
+    bash "$TEMP_SCRIPT" "$@"
+    rm -f "$TEMP_SCRIPT" >/dev/null 2>&1
+else
+    echo "无法在线获取脚本，请检查网络连接"
+    exit 1
+fi'
+    
+    script_path="/usr/local/bin/ssh_tool.sh"
+    echo "$wrapper_content" > "$script_path"
+    chmod +x "$script_path"
+    link_names=("k" "K")
+    
+    for link_name in "${link_names[@]}"; do
+        link_path="/usr/local/bin/$link_name"
+        if [ ! -L "$link_path" ] || [ "$(readlink "$link_path")" != "$script_path" ]; then
+            ln -sf "$script_path" "$link_path" >/dev/null 2>&1
         fi
     done
-    . "$config_file"
 }
-config_files=("/root/.bashrc" "/root/.profile" "/root/.bash_profile")
-for config_file in "${config_files[@]}"; do
-    add_alias "$config_file"
-done
+create_shortcut
 
 # 获取当前服务器ipv4和ipv6
 ip_address() {
-    ipv4_address=$(curl -s ipv4.ip.sb)
-    ipv6_address=$(curl -s --max-time 1 ipv6.ip.sb)
+    ipv4_address=$(curl -s -m 2 ipv4.ip.sb)
+    ipv6_address=$(curl -s -m 2 ipv6.ip.sb)
 }
 
 # 安装依赖包
@@ -59,6 +72,31 @@ install() {
             apk add "$package"
         else
             echo -e"${red}暂不支持你的系统!${re}"
+            return 1
+        fi
+    done
+
+    return 0
+}
+
+# 卸载依赖包
+remove() {
+    if [ $# -eq 0 ]; then
+        echo -e "${red}未提供软件包参数!${re}"
+        return 1
+    fi
+
+    for package in "$@"; do
+        if command -v apt &>/dev/null; then
+            apt remove -y "$package" && apt autoremove -y
+        elif command -v dnf &>/dev/null; then
+            dnf remove -y "$package" && dnf autoremove -y
+        elif command -v yum &>/dev/null; then
+            yum remove -y "$package" && yum autoremove -y
+        elif command -v apk &>/dev/null; then
+            apk del "$package"
+        else
+            echo -e "${red}暂不支持你的系统!${re}"
             return 1
         fi
     done
@@ -136,31 +174,6 @@ install_java() {
             break_end
         fi
     fi   
-}
-
-# 卸载依赖包
-remove() {
-    if [ $# -eq 0 ]; then
-        echo -e "${red}未提供软件包参数!${re}"
-        return 1
-    fi
-
-    for package in "$@"; do
-        if command -v apt &>/dev/null; then
-            apt remove -y "$package" && apt autoremove -y
-        elif command -v dnf &>/dev/null; then
-            dnf remove -y "$package" && dnf autoremove -y
-        elif command -v yum &>/dev/null; then
-            yum remove -y "$package" && yum autoremove -y
-        elif command -v apk &>/dev/null; then
-            apk del "$package"
-        else
-            echo -e "${red}暂不支持你的系统!${re}"
-            return 1
-        fi
-    done
-
-    return 0
 }
 
 # 初始安装依赖包
@@ -6875,7 +6888,6 @@ EOF
     curl -sS -O https://raw.githubusercontent.com/eooce/ssh_tool/main/update_log.sh && chmod +x update_log.sh && ./update_log.sh
     rm update_log.sh
     echo ""
-    curl -sS -O https://raw.githubusercontent.com/eooce/ssh_tool/main/ssh_tool.sh && chmod +x ssh_tool.sh
     echo -e "${green}脚本已更新到最新版本！${re}"
     sleep 1
     main_menu
