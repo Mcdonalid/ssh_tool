@@ -40,6 +40,7 @@ fi'
             ln -sf "$script_path" "$link_path" >/dev/null 2>&1
         fi
     done
+    hash -r >/dev/null 2>&1
 }
 create_shortcut
 
@@ -3333,25 +3334,35 @@ case $choice in
       case $sub_choice in
           1)
               clear
-              read -p $'\033[1;91m请输入你的快捷按键: \033[0m' kuaijiejian              
+              read -p $'\033[1;91m请输入你需要设置的快捷按键: \033[0m' kuaijiejian              
                 [ -z "$kuaijiejian" ] && echo -e "${red}你似乎什么也没输入${re}" && main_menu || kuaijiejian_value="$kuaijiejian"
     
-                # 将 $kuaijiejian 转换为大写和小写
-                uppercase_value=$(echo "$kuaijiejian_value" | tr '[:lower:]' '[:upper:]')
-                lowercase_value=$(echo "$kuaijiejian_value" | tr '[:upper:]' '[:lower:]')
-
-                # 判断 $kuaijiejian 的值是大写还是小写
-                if [[ "$kuaijiejian_value" == "$uppercase_value" ]]; then
-                    sed -i "s/alias K=/alias $kuaijiejian_value=/g" ~/.bashrc ~/.profile ~/.bash_profile
-                    sed -i "s/alias k=/alias $lowercase_value=/g" ~/.bashrc ~/.profile ~/.bash_profile
-                elif [[ "$kuaijiejian_value" == "$lowercase_value" ]]; then
-                    sed -i "s/alias k=/alias $kuaijiejian_value=/g" ~/.bashrc ~/.profile ~/.bash_profile
-                    sed -i "s/alias K=/alias $uppercase_value=/g" ~/.bashrc ~/.profile ~/.bash_profile
+                # 检查输入是否为单个字母
+                if [[ ! "$kuaijiejian_value" =~ ^[a-zA-Z]$ ]]; then
+                    echo -e "${red}请输入单个大写或小写字母${re}"
                 else
-                    echo -e "${red}请输入大写或小写字母${re}"
+                    # 将输入转换为大写和小写
+                    uppercase_value=$(echo "$kuaijiejian_value" | tr '[:lower:]' '[:upper:]')
+                    lowercase_value=$(echo "$kuaijiejian_value" | tr '[:upper:]' '[:lower:]')
+                    
+                    # 软连接目标脚本
+                    script_path="/usr/local/bin/ssh_tool.sh"
+                    
+                    # 确保目标脚本存在且有执行权限
+                    if [ ! -f "$script_path" ]; then
+                        echo -e "${red}目标脚本不存在，请先安装脚本${re}"
+                    else
+                        # 删除可能存在的同名软连接
+                        rm -f "/usr/local/bin/$uppercase_value" 2>/dev/null
+                        rm -f "/usr/local/bin/$lowercase_value" 2>/dev/null
+                        
+                        # 创建大写和小写的软连接
+                        ln -sf "$script_path" "/usr/local/bin/$uppercase_value"
+                        ln -sf "$script_path" "/usr/local/bin/$lowercase_value"
+                        hash -r >/dev/null 2>&1
+                        echo -e "${green}快捷键已设置为：$uppercase_value 和 $lowercase_value${re}"
+                    fi
                 fi
-                source ~/.bashrc && source ~/.profile && source ~/.bash_profile
-                echo -e "${green}快捷键已设置${re}"
               ;;
 
           2)
@@ -5240,8 +5251,25 @@ EOF
 
         16)
         clear
-            rm -rf /home/mtproxy && mkdir /home/mtproxy && cd /home/mtproxy
-            curl -fsSL -o mtproxy.sh https://github.com/ellermister/mtproxy/raw/master/mtproxy.sh && chmod +x mtproxy.sh && bash mtproxy.sh
+            install lsof
+            clear
+            read -p $'\033[1;35m请输入MTProto代理端口(直接回车则使用随机端口): \033[0m' port
+            
+             if [[ -z $port ]]; then
+                 port=$(shuf -i 2000-65000 -n 1)
+                 echo -e "${green}使用随机端口: $port${re}"
+             fi
+             
+             while [[ -n $(lsof -i :$port 2>/dev/null) ]]; do
+                 echo -e "${red}${port}端口已经被其他程序占用，请更换端口重试${re}"
+                 read -p $'\033[1;35m请输入MTProto代理端口(直接回车则使用随机端口): \033[0m' port
+                
+                 if [[ -z $port ]]; then
+                     port=$(shuf -i 2000-65000 -n 1)
+                     echo -e "${green}使用随机端口: $port${re}"
+                 fi
+             done
+            PORT=$port bash <(curl -Ls https://raw.githubusercontent.com/eooce/scripts/master/mtp.sh)
             sleep 1
             break_end
         ;;
@@ -5260,13 +5288,15 @@ EOF
             case $sub_choice in
                 1)
                   clear
+                    install lsof
+                    clear
                     read -p $'\033[1;35m请输入reality节点端口(nat小鸡请输入可用端口范围内的端口),回车跳过则使用随机端口：\033[0m' port
                     [[ -z $port ]]
-                    until [[ -z $(netstat -tuln | grep -w tcp | awk '{print $4}' | sed 's/.*://g' | grep -w "$port") ]]; do
-                        if [[ -n $(netstat -tuln | grep -w tcp | awk '{print $4}' | sed 's/.*://g' | grep -w "$port") ]]; then
+                    until [[ -z $(lsof -i :$port 2>/dev/null) ]]; do
+                        if [[ -n $(lsof -i :$port 2>/dev/null) ]]; then
                             echo -e "${red}${port}端口已经被其他程序占用，请更换端口重试${re}"
                             read -p $'\033[1;35m设置 reality 端口[1-65535]（回车跳过将使用随机端口）：\033[0m' port
-                            [[ -z $PORT ]] && port=$(shuf -i 2000-65000 -n 1)
+                            [[ -z $port ]] && port=$(shuf -i 2000-65000 -n 1)
                         fi
                     done
                     if [ -f "/etc/alpine-release" ]; then
@@ -5307,8 +5337,8 @@ EOF
                     clear
                         read -p $'\033[1;35m设置 reality 端口[1-65535]（回车跳过将使用随机端口）：\033[0m' new_port
                         [[ -z $new_port ]] && new_port=$(shuf -i 2000-65000 -n 1)
-                        until [[ -z $(netstat -tuln | grep -w tcp | awk '{print $4}' | sed 's/.*://g' | grep -w "$port") ]]; do
-                            if [[ -n $(netstat -tuln | grep -w tcp | awk '{print $4}' | sed 's/.*://g' | grep -w "$port") ]]; then
+                        until [[ -z $(lsof -i :$new_port 2>/dev/null) ]]; do
+                            if [[ -n $(lsof -i :$new_port 2>/dev/null) ]]; then
                                 echo -e "${red}${new_port}端口已经被其他程序占用，请更换端口重试${re}"
                                 read -p $'\033[1;35m设置reality端口[1-65535]（回车跳过将使用随机端口）：\033[0m' new_port
                                 [[ -z $new_port ]] && new_port=$(shuf -i 2000-65000 -n 1)
