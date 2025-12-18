@@ -5023,7 +5023,7 @@ EOF
       echo -e "${white} 1. F佬Sing-box一键脚本        5. 老王xray-2go一键脚本${re}"
       echo -e "${white} 2. 老王Sing-box四合一         6. F佬ArgoX一键脚本${re}"
       echo -e "${white} 3. 勇哥Sing-box四合一         7. Suoha一键Argo脚本${re}"
-      echo -e "${white} 4. 233boy.sing-box一键脚本    8. 老王Argo+哪吒${re}"
+      echo -e "${white} 4. 233boy.sing-box一键脚本    8. 老王小钢炮(可挂哪吒)${re}"
       echo -e "${yellow}---------------------------------------------------------${re}"
       echo -e "${yellow}        单协议                    XRAY面板及其他${re}"
       echo -e "${yellow}---------------------------------------------------------${re}"
