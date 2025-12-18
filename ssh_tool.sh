@@ -5101,7 +5101,7 @@ EOF
             fi
             read -p $'\033[1;35m请输入你的UUID(留空将随机生成,哪吒v1将依赖此uuid): \033[0m' uuid
             [[ -z $uuid ]] && uuid=$(cat /proc/sys/kernel/random/uuid)
-            UUID=$uuid NEZHA_SERVER=$nzserver NEZHA_PORT=$nzport NEZHA_KEY=$nzkey ARGO_DOMAIN=$argodomain ARGO_AUTH='$argokey' HY2_PORT=$hy2pt TUIC_PORT=$tuicpt REALITY_PORT=$realitypt bash <(curl -Ls https://main.ssss.nyc.mn/sb.sh)
+            UUID=$uuid NEZHA_SERVER=$nzserver NEZHA_PORT=$nzport NEZHA_KEY=$nzkey ARGO_DOMAIN=$argodomain ARGO_AUTH=$argokey HY2_PORT=$hy2pt TUIC_PORT=$tuicpt REALITY_PORT=$realitypt bash <(curl -Ls https://main.ssss.nyc.mn/sb.sh)
             sleep 1
             break_end
         ;;
