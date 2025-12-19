@@ -5093,7 +5093,7 @@ EOF
                 read -p $'\033[1;35m请输入固定隧道密钥(json或token): \033[0m' argokey
             fi
 
-            read -p $'\033[1;33m是否需要直连协议(hy2,tuic,reality等,直接回车不启用)？(y/n) : \033[0m' isdirect
+            read -p $'\033[1;33m是否需要直连协议(hy2,tuic,reality,anytls,socks5,anyReality等,直接回车不启用)？(y/n) : \033[0m' isdirect
             if [ "$isdirect" == "y" ] || [ "$isdirect" == "Y" ]; then
                 read -p $'\033[1;35m请输入Hy2节点端口(不需要可直接回车留空): \033[0m' hy2pt
                 read -p $'\033[1;35m请输入Tuic节点端口(不需要可直接回车留空): \033[0m' tuicpt
