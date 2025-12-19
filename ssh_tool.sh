@@ -5095,13 +5095,16 @@ EOF
 
             read -p $'\033[1;33m是否需要直连协议(hy2,tuic,reality等,直接回车不启用)？(y/n) : \033[0m' isdirect
             if [ "$isdirect" == "y" ] || [ "$isdirect" == "Y" ]; then
-                read -p $'\033[1;35m请输入hy2节点端口(不需要可直接回车留空): \033[0m' hy2pt
-                read -p $'\033[1;35m请输入tuic节点端口(不需要可直接回车留空): \033[0m' tuicpt
-                read -p $'\033[1;35m请输入reality节点端口(不需要可直接回车留空): \033[0m' realitypt
+                read -p $'\033[1;35m请输入Hy2节点端口(不需要可直接回车留空): \033[0m' hy2pt
+                read -p $'\033[1;35m请输入Tuic节点端口(不需要可直接回车留空): \033[0m' tuicpt
+                read -p $'\033[1;35m请输入Reality节点端口(不需要可直接回车留空): \033[0m' realitypt
+                read -p $'\033[1;35m请输入Anytls节点端口(不需要可直接回车留空): \033[0m' anytlspt
+                read -p $'\033[1;35m请输入Socks5节点端口(不需要可直接回车留空): \033[0m' socks5pt
+                read -p $'\033[1;35m请输入AnyReality节点端口(不需要可直接回车留空): \033[0m' anyrealitypt
             fi
             read -p $'\033[1;35m请输入你的UUID(留空将随机生成,哪吒v1将依赖此uuid): \033[0m' uuid
             [[ -z $uuid ]] && uuid=$(cat /proc/sys/kernel/random/uuid)
-            UUID=$uuid NEZHA_SERVER=$nzserver NEZHA_PORT=$nzport NEZHA_KEY=$nzkey ARGO_DOMAIN=$argodomain ARGO_AUTH=$argokey HY2_PORT=$hy2pt TUIC_PORT=$tuicpt REALITY_PORT=$realitypt bash <(curl -Ls https://main.ssss.nyc.mn/sb.sh)
+            UUID=$uuid NEZHA_SERVER=$nzserver NEZHA_PORT=$nzport NEZHA_KEY=$nzkey ARGO_DOMAIN=$argodomain ARGO_AUTH=$argokey HY2_PORT=$hy2pt TUIC_PORT=$tuicpt REALITY_PORT=$realitypt ANYTLS_PORT=$anytlspt S5_PORT=$socks5pt ANYREALITY_PORT=$anyrealitypt bash <(curl -Ls https://main.ssss.nyc.mn/sb.sh)
             sleep 1
             break_end
         ;;
