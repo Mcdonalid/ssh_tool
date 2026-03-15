@@ -6644,6 +6644,17 @@ EOF
 
                         if [ "$confirm" == "y" ] || [ "$confirm" == "Y" ]; then
 
+                            # 固定 dns，防止修改导致失败开小鸡失败
+                            systemctl disable systemd-resolved --now > /dev/null 2>&1
+                            rm -rf /etc/resolv.conf > /dev/null 2>&1
+                            cat >/etc/resolv.conf <<EOF
+nameserver 8.8.8.8
+nameserver 1.1.1.1
+nameserver 2606:4700:4700::1111
+nameserver 2001:4860:4860::8888
+EOF
+                            chattr +i /etc/resolv.conf > /dev/null 2>&1
+                            
                             echo -e "${yellow}开始进行安装incus主体...${re}"
                             sleep 1
                             curl -L https://raw.githubusercontent.com/oneclickvirt/incus/main/scripts/incus_install.sh -o incus_install.sh && chmod +x incus_install.sh && bash incus_install.sh
