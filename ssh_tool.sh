@@ -3521,7 +3521,7 @@ case $choice in
                     echo -e "${yellow}Windows默认用户名：${purple}Administrator${yellow} 默认密码：${purple}Teddysun.com${yellow} 默认远程连接端口${purple}3389${re}"
                     echo -e "${yellow}详细参数参考Github项目地址：https://github.com/leitbogioro/Tools${re}"
                     echo ""
-                    echo -e "${green} 1.安装Debian-11            2.安装Debian-12${re}"
+                    echo -e "${green} 1.安装Debian-12            2.安装Debian-13${re}"
                     echo -e "${green} 3.安装Ubuntu-22.04         4.安装Ubuntu-24.04${re}"
                     echo -e "${green} 5.安装Alpine-3.19          6.安装Alpine-3.20${re}"
                     echo -e "${green} 7.安装Centos-8             8.安装Centos-9${re}"
@@ -3535,17 +3535,17 @@ case $choice in
                    
                     case $sub_choice in
                         1) 
-                            echo -e "${green}开始为你安装Debian-11${re}"
+                            echo -e "${green}开始为你安装Debian-12${re}"
                             sleep 1
-                            bash InstallNET.sh -debian 11
+                            bash InstallNET.sh -debian 12
                             sleep 2
                             clear
                             restart_system
                             ;;
                         2) 
-                            echo -e "${green}开始为你安装Debian-12${re}"
+                            echo -e "${green}开始为你安装Debian-13${re}"
                             sleep 1
-                            bash InstallNET.sh -debian 12
+                            bash InstallNET.sh -debian 13
                             sleep 2
                             clear
                             restart_system
