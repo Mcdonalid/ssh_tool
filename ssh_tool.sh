@@ -64,7 +64,7 @@ install() {
         fi
         echo -e "${yellow}正在安装 ${package}...${re}"
         if command -v apt &>/dev/null; then
-            apt install -y "$package"
+            DEBIAN_FRONTEND=noninteractive apt install -y "$package"
         elif command -v dnf &>/dev/null; then
             dnf install -y "$package"
         elif command -v yum &>/dev/null; then
@@ -673,7 +673,7 @@ case $choice in
     clear
     update_system() {
         if command -v apt &>/dev/null; then
-            apt-get update && apt-get upgrade -y
+            DEBIAN_FRONTEND=noninteractive apt-get update && apt-get upgrade -y
         elif command -v dnf &>/dev/null; then
             dnf check-update && dnf upgrade -y
         elif command -v yum &>/dev/null; then
